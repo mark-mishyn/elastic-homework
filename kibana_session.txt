@@ -1,0 +1,47 @@
+GET _cat/indices
+
+GET words
+
+GET autocomplete/_mapping
+
+POST _reindex
+{
+ "source": {
+   "index": "words"
+ },
+ "dest": {
+   "index": "autocomplete"
+ }
+}
+
+# EXAMPLE WITH STRICT MATCH:
+GET autocomplete/_search
+{
+   "size": 5,
+   "query": {
+       "multi_match": {
+           "query": "booba",
+           "type": "bool_prefix",
+           "fields": [
+               "txt*"
+           ]
+       }
+   }
+}
+ 
+# EXAMPLE WITH TYPOS: 
+GET autocomplete/_search
+{
+  "query": {
+    "fuzzy": {
+      "txt": {
+        "value": "wich",
+        "fuzziness": 1,
+        "max_expansions": 50,
+        "prefix_length": 0,
+        "transpositions": true,
+        "rewrite": "constant_score"
+      }
+    }
+  }
+}
